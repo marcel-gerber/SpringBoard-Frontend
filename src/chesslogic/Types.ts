@@ -1,3 +1,12 @@
+import {Piece} from "./pieces/Piece.ts";
+import {Pawn} from "./pieces/Pawn.ts";
+import {Knight} from "./pieces/Knight.ts";
+import {Bishop} from "./pieces/Bishop.ts";
+import {Rook} from "./pieces/Rook.ts";
+import {Queen} from "./pieces/Queen.ts";
+import {King} from "./pieces/King.ts";
+import {NullPiece} from "./pieces/NullPiece.ts";
+
 /**
  * Represents a color in a chess game
  */
@@ -71,4 +80,54 @@ export enum SquareValue {
     A7, B7, C7, D7, E7, F7, G7, H7,
     A8, B8, C8, D8, E8, F8, G8, H8,
     NONE
+}
+
+const squareValues = Object.values(SquareValue);
+
+/**
+ * Get the SquareValue based on the index
+ *
+ * @param index Index of Square
+ */
+export function getSquareValue(index: number): SquareValue {
+    if(index < 0 || index >= squareValues.length) {
+        return SquareValue.NONE;
+    }
+    return squareValues[index] as SquareValue;
+}
+
+/**
+ * All castling rights can be stored in just 4 bits.
+ * 00: short castling (kings' side)
+ * 000: long castling (queens' side)
+ */
+export enum CastlingValue {
+    NO_CASTLING = 0,
+    WHITE_00 = 0b00000001,
+    WHITE_000 = 0b00000010,
+    BLACK_00 = 0b00000100,
+    BLACK_000 = 0b00001000
+}
+
+/**
+ * Creates a new Piece object based on the provided character
+ *
+ * @param char
+ */
+export function getPieceFromChar(char: string): Piece {
+    switch (char) {
+        case 'P': return new Pawn(Color.WHITE);
+        case 'N': return new Knight(Color.WHITE);
+        case 'B': return new Bishop(Color.WHITE);
+        case 'R': return new Rook(Color.WHITE);
+        case 'Q': return new Queen(Color.WHITE);
+        case 'K': return new King(Color.WHITE);
+        case 'p': return new Pawn(Color.BLACK);
+        case 'n': return new Knight(Color.BLACK);
+        case 'b': return new Bishop(Color.BLACK);
+        case 'r': return new Rook(Color.BLACK);
+        case 'q': return new Queen(Color.BLACK);
+        case 'k': return new King(Color.BLACK);
+        default: return NullPiece.instance;
+    }
 }
