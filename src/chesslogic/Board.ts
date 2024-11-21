@@ -1,8 +1,9 @@
 import {Piece} from "./pieces/Piece.ts";
 import {NullPiece} from "./pieces/NullPiece.ts";
-import {CastlingValue, Color, getPieceFromChar, SquareValue} from "./Types.ts";
-import {Castling} from "./Castling.ts";
+import {Color, getOpposite, getPieceFromChar, SquareValue} from "./Types.ts";
+import {Castling, CastlingValue} from "./Castling.ts";
 import {Square} from "./Square.ts";
+import {King} from "./pieces/King.ts";
 
 /**
  * Class for representing a (logical) Chess board
@@ -15,7 +16,7 @@ export class Board {
     public enPassant: Square;
     public halfMoveCounter: number;
 
-    constructor() {
+    public constructor() {
         this.sideToMove = Color.WHITE;
         this.castling = new Castling();
         this.enPassant = new Square(SquareValue.NONE);
@@ -44,6 +45,102 @@ export class Board {
      */
     private placePiece(index: number, piece: Piece): void {
         this.pieces[index] = piece;
+    }
+
+    /**
+     * Returns 'true' if the piece standing on the provided square has the same color as the provided piece
+     *
+     * @param square Square
+     * @param piece Piece
+     */
+    public isFriendly(square: Square, piece: Piece): boolean {
+        return this.getPiece(square.getIndex()).color == piece.color;
+    }
+
+    /**
+     * Returns 'true' if the piece standing on the provided square has the opposite color as the provided piece
+     *
+     * @param square Square
+     * @param piece Piece
+     */
+    public isOpponent(square: Square, piece: Piece): boolean {
+        const targetPiece: Piece = this.getPiece(square.getIndex());
+        return (!(targetPiece instanceof NullPiece) && targetPiece.color != piece.color);
+    }
+
+    /**
+     * Returns 'true' if the piece standing on the provided square is a NullPiece
+     * or the provided piece is an enemy piece
+     *
+     * @param square
+     * @param piece
+     */
+    public isEmptyOrOpponent(square: Square, piece: Piece): boolean {
+        const targetPiece: Piece = this.getPiece(square.getIndex());
+        return targetPiece instanceof NullPiece || targetPiece.color != piece.color;
+    }
+
+    /**
+     * Returns 'true' when a king is standing on the provided square
+     *
+     * @param square Square
+     */
+    public isKing(square: Square): boolean {
+        return this.getPiece(square.getIndex()) instanceof King;
+    }
+
+    /**
+     * Returns 'true' if the piece standing on the square is a NullPiece
+     *
+     * @param index number
+     */
+    public isEmpty(index: number): boolean {
+        return this.getPiece(index) instanceof NullPiece;
+    }
+
+    /**
+     * Returns 'true' if all indices of the array are empty on the board
+     *
+     * @param indices
+     */
+    public areEmpty(indices: number[]): boolean {
+        for(const index of indices) {
+            if(!this.isEmpty(index)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns 'true' if any squares' indices are attacked by the current opponent
+     *
+     * @param indices
+     */
+    public areAttacked(indices: number[]): boolean {
+        const attackedSquares: Square[] = this.getAttackedSquares(getOpposite(this.sideToMove));
+
+        for(const square of attackedSquares) {
+            for(const index of indices) {
+                if(square.getIndex() === index) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns a list of squares that are currently attacked by the provided color
+     *
+     * @param color
+     */
+    public getAttackedSquares(color: Color): Array<Square> {
+        const attackedSquares: Array<Square> = [];
+
+        for(let i = 0; i < this.pieces.length; i++) {
+            const piece: Piece = this.getPiece(i);
+            if(piece.color != color) continue;
+
+            attackedSquares.push.apply([...piece.attackedSquares(this, new Square(i))]);
+        }
+        return attackedSquares;
     }
 
     /**

@@ -1,4 +1,4 @@
-import {getSquareValue, SquareValue} from "./Types.ts";
+import {Direction, getSquareValue, SquareValue} from "./Types.ts";
 
 /**
  * Class for representing a square on the board
@@ -7,8 +7,29 @@ export class Square {
 
     public _value: SquareValue;
 
-    constructor(readonly value: SquareValue = SquareValue.NONE) {
+    public constructor(readonly value: SquareValue = SquareValue.NONE) {
         this._value = value;
+    }
+
+    /**
+     * Returns the index of the square in a LERF mapping
+     */
+    public getIndex(): number {
+        return this._value.valueOf();
+    }
+
+    /**
+     * Returns the file index of the square
+     */
+    public getFileIndex(): number {
+        return this.getIndex() & 7;
+    }
+
+    /**
+     * Returns the rank index of the square
+     */
+    public getRankIndex(): number {
+        return this.getIndex() >> 3;
     }
 
     /**
@@ -24,6 +45,22 @@ export class Square {
 
         const index: number = ((str.charCodeAt(0) - "a".charCodeAt(0)) + ((str.charCodeAt(1) - "1".charCodeAt(0)) * 8));
         this._value = getSquareValue(index);
+    }
+
+    /**
+     * Adds a direction to the square and returns a new Square
+     *
+     * @param square Square
+     * @param direction Direction
+     */
+    public static add(square: Square, direction: Direction): Square {
+        const targetIndex: number = square.getIndex() + direction.valueOf();
+        const targetSquare: Square = new Square(targetIndex);
+
+        if(Math.abs(square.getFileIndex() - targetSquare.getFileIndex()) > 2) {
+            return new Square(SquareValue.NONE);
+        }
+        return targetSquare;
     }
 
 }

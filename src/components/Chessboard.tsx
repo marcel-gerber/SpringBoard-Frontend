@@ -16,17 +16,17 @@ export default function Chessboard() {
         <div className="grid grid-cols-8 w-[700px]">
             {board.pieces.map(() => {
                 index++;
-                if(index % 8 == 0) {
-                    if(row == -1) {
-                        row++;
-                    } else {
+                const col: number = index % 8;
+
+                if(col == 0) {
+                    row++;
+
+                    if(row != 0) {
                         index -= 16;
-                        row++;
                     }
                 }
 
                 const piece: Piece = board.getPiece(index);
-                const col: number = index % 8;
                 const pieceImage: string | null = piece.image();
 
                 return (

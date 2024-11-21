@@ -11,13 +11,13 @@ export class Move {
     public readonly _to: Square;
     public readonly _promotionType: PieceType;
 
-    public constructor(moveType: MoveType = MoveType.NORMAL,
-                       from: Square,
+    public constructor(from: Square,
                        to: Square,
+                       moveType: MoveType = MoveType.NORMAL,
                        promotionType: PieceType = PieceType.KNIGHT) {
-        this._moveType = moveType;
         this._from = from;
         this._to = to;
+        this._moveType = moveType;
         this._promotionType = promotionType;
     }
 

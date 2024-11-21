@@ -1,4 +1,17 @@
-import {CastlingValue, Color} from "./Types.ts";
+import {Color} from "./Types.ts";
+
+/**
+ * All castling rights can be stored in just 4 bits.
+ * 00: short castling (kings' side)
+ * 000: long castling (queens' side)
+ */
+export enum CastlingValue {
+    NO_CASTLING = 0,
+    WHITE_00 = 0b00000001,
+    WHITE_000 = 0b00000010,
+    BLACK_00 = 0b00000100,
+    BLACK_000 = 0b00001000
+}
 
 /**
  * Class for representing the castling rights.

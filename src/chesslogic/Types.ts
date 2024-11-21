@@ -17,6 +17,19 @@ export enum Color {
 }
 
 /**
+ * Returns the opposite color
+ *
+ * @param color
+ */
+export function getOpposite(color: Color): Color {
+    switch (color) {
+        case Color.WHITE: return Color.BLACK;
+        case Color.BLACK: return Color.WHITE;
+        default: return Color.NONE;
+    }
+}
+
+/**
  * Enum containing all piece types of a chess game
  */
 export enum PieceType {
@@ -41,7 +54,7 @@ export enum MoveType {
 }
 
 /**
- * Enum representing a direction on a chess board using LERF mapping (see Square.java)
+ * Enum representing a direction on a chess board using LERF mapping
  */
 export enum Direction {
     // Ray Directions
@@ -94,19 +107,6 @@ export function getSquareValue(index: number): SquareValue {
         return SquareValue.NONE;
     }
     return squareValues[index] as SquareValue;
-}
-
-/**
- * All castling rights can be stored in just 4 bits.
- * 00: short castling (kings' side)
- * 000: long castling (queens' side)
- */
-export enum CastlingValue {
-    NO_CASTLING = 0,
-    WHITE_00 = 0b00000001,
-    WHITE_000 = 0b00000010,
-    BLACK_00 = 0b00000100,
-    BLACK_000 = 0b00001000
 }
 
 /**
