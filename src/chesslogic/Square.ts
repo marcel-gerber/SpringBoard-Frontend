@@ -15,7 +15,7 @@ export class Square {
      * Returns the index of the square in a LERF mapping
      */
     public getIndex(): number {
-        return this._value.valueOf();
+        return +this._value;
     }
 
     /**
@@ -54,8 +54,8 @@ export class Square {
      * @param direction Direction
      */
     public static add(square: Square, direction: Direction): Square {
-        const targetIndex: number = square.getIndex() + direction.valueOf();
-        const targetSquare: Square = new Square(targetIndex);
+        const targetIndex: number = square.getIndex() + direction;
+        const targetSquare: Square = new Square(getSquareValue(targetIndex));
 
         if(Math.abs(square.getFileIndex() - targetSquare.getFileIndex()) > 2) {
             return new Square(SquareValue.NONE);

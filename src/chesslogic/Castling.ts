@@ -38,8 +38,8 @@ export class Castling {
     private static readonly white00NotAttacked: number[] = [4, 5, 6];
     private static readonly white000NotAttacked: number[] = [2, 3, 4];
 
-    public constructor() {
-        this.castlingRights = CastlingValue.NO_CASTLING;
+    public constructor(rights: number = CastlingValue.NO_CASTLING) {
+        this.castlingRights = rights;
     }
 
     /**
@@ -119,6 +119,14 @@ export class Castling {
      */
     public hasNoCastling(): boolean {
         return this.castlingRights == CastlingValue.NO_CASTLING;
+    }
+
+    /**
+     * Clones the object with its current castling rights.
+     * Alternative to a copy constructor
+     */
+    public clone(): Castling {
+        return new Castling(this.castlingRights);
     }
 
     /**

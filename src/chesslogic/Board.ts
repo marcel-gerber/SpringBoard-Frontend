@@ -1,9 +1,31 @@
 import {Piece} from "./pieces/Piece.ts";
 import {NullPiece} from "./pieces/NullPiece.ts";
-import {Color, getOpposite, getPieceFromChar, SquareValue} from "./Types.ts";
+import {Color, getOpposite, getPieceFromChar, getSquareValue, MoveType, SquareValue} from "./Types.ts";
 import {Castling, CastlingValue} from "./Castling.ts";
 import {Square} from "./Square.ts";
 import {King} from "./pieces/King.ts";
+import {Move} from "./Move.ts";
+import {Rook} from "./pieces/Rook.ts";
+import {Pawn} from "./pieces/Pawn.ts";
+
+/**
+ * Class holding data needed for unmaking a move
+ */
+class StateInfo {
+
+    public castling: Castling;
+    public enPassant: Square;
+    public captured: Piece;
+    public halfMoveCounter: number;
+
+    public constructor(castling: Castling, enPassant: Square, captured: Piece, halfMoveCounter: number) {
+        this.castling = castling;
+        this.enPassant = enPassant;
+        this.captured = captured;
+        this.halfMoveCounter = halfMoveCounter;
+    }
+
+}
 
 /**
  * Class for representing a (logical) Chess board
@@ -15,6 +37,9 @@ export class Board {
     public castling: Castling;
     public enPassant: Square;
     public halfMoveCounter: number;
+
+    // All previous states of the board will be saved in here
+    private prevStates: StateInfo[] = [];
 
     public constructor() {
         this.sideToMove = Color.WHITE;
@@ -45,6 +70,16 @@ export class Board {
      */
     private placePiece(index: number, piece: Piece): void {
         this.pieces[index] = piece;
+    }
+
+    /**
+     * Removes a piece from the board
+     *
+     * @param index
+     * @private
+     */
+    private removePiece(index: number): void {
+        this.pieces[index] = NullPiece.instance;
     }
 
     /**
@@ -127,7 +162,7 @@ export class Board {
     }
 
     /**
-     * Returns a list of squares that are currently attacked by the provided color
+     * Returns an array of squares that are currently attacked by the provided color
      *
      * @param color
      */
@@ -138,9 +173,70 @@ export class Board {
             const piece: Piece = this.getPiece(i);
             if(piece.color != color) continue;
 
-            attackedSquares.push.apply([...piece.attackedSquares(this, new Square(i))]);
+            const attacks: Array<Square> = piece.attackedSquares(this, new Square(getSquareValue(i)));
+            attackedSquares.push(...attacks);
         }
         return attackedSquares;
+    }
+
+    /**
+     * Plays a move on the board
+     *
+     * @param move
+     */
+    public makeMove(move: Move): void {
+        const from: Square = move._from;
+        const to: Square = move._to;
+        const moveType: MoveType = move._moveType;
+
+        const moved: Piece = this.getPiece(from.getIndex());
+        const captured: Piece = this.getPiece(to.getIndex());
+
+        const castling: Castling = this.castling.clone();
+        const enPassantSquare: Square = new Square(this.enPassant._value);
+
+        const stateInfo: StateInfo = new StateInfo(castling, enPassantSquare, captured, this.halfMoveCounter);
+        this.prevStates.push(stateInfo);
+
+        this.halfMoveCounter++;
+
+        if(this.enPassant._value != SquareValue.NONE) {
+            this.enPassant._value = SquareValue.NONE;
+        }
+
+        // Played move is a capture
+        if(!(captured instanceof NullPiece)) {
+            this.halfMoveCounter = 0;
+            this.removePiece(to.getIndex());
+
+            if(captured instanceof Rook) {
+                const castlingValue: CastlingValue = Castling.fromRookSourceIndex(to.getIndex());
+                this.castling.unSet(castlingValue);
+            }
+        }
+
+        if(this.castling.hasAny(this.sideToMove)) {
+            if(moved instanceof King) {
+                this.castling.unSetForColor(this.sideToMove);
+            }
+            else if(moved instanceof Rook) {
+                const castlingValue: CastlingValue = Castling.fromRookSourceIndex(from.getIndex());
+                this.castling.unSet(castlingValue);
+            }
+        }
+
+        if(moved instanceof Pawn) {
+            this.halfMoveCounter = 0;
+
+            // Double push
+            if(Math.abs(from.getIndex() - to.getIndex()) == 16) {
+                // TODO: isEnPassantPossible
+            }
+        }
+
+        if(moveType == MoveType.CASTLING) {
+            // TODO
+        }
     }
 
     /**

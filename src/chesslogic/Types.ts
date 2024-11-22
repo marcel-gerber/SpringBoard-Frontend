@@ -95,7 +95,7 @@ export enum SquareValue {
     NONE
 }
 
-const squareValues = Object.values(SquareValue);
+const squareValues = Object.values(SquareValue).filter(value => !isNaN(+value));
 
 /**
  * Get the SquareValue based on the index
