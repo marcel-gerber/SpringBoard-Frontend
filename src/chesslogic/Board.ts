@@ -1,6 +1,15 @@
 import {Piece} from "./pieces/Piece.ts";
 import {NullPiece} from "./pieces/NullPiece.ts";
-import {Color, getOpposite, getPieceFromChar, getSquareValue, MoveType, SquareValue} from "./Types.ts";
+import {
+    Color,
+    Direction,
+    getOpposite,
+    getPieceFromChar,
+    getPieceFromType,
+    getSquareValue,
+    MoveType,
+    SquareValue
+} from "./Types.ts";
 import {Castling, CastlingValue} from "./Castling.ts";
 import {Square} from "./Square.ts";
 import {King} from "./pieces/King.ts";
@@ -59,6 +68,19 @@ export class Board {
      */
     public getPiece(index: number): Piece {
         return this.pieces[index];
+    }
+
+    /**
+     * Returns the piece standing on this square, but checks if the square is valid.
+     * If not it returns the NullPieces' instance
+     *
+     * @param square Square
+     */
+    public getPieceOrNullPiece(square: Square): Piece {
+        if(square._value == SquareValue.NONE) {
+            return NullPiece.instance;
+        }
+        return this.getPiece(square.getIndex());
     }
 
     /**
@@ -180,6 +202,24 @@ export class Board {
     }
 
     /**
+     * Returns 'true' if en passant is possible for a pawn standing on the provided square
+     *
+     * @param to
+     * @param piece
+     * @private
+     */
+    private isEnPassantPossible(to: Square, piece: Piece): boolean {
+        const east: Square = Square.add(to, Direction.EAST);
+        const west: Square = Square.add(to, Direction.WEST);
+
+        const neighborEast: Piece = this.getPieceOrNullPiece(east);
+        const neighborWest: Piece = this.getPieceOrNullPiece(west);
+
+        return (neighborEast instanceof Pawn && neighborEast.color != piece.color) ||
+            (neighborWest instanceof Pawn && neighborWest.color != piece.color);
+    }
+
+    /**
      * Plays a move on the board
      *
      * @param move
@@ -230,13 +270,45 @@ export class Board {
 
             // Double push
             if(Math.abs(from.getIndex() - to.getIndex()) == 16) {
-                // TODO: isEnPassantPossible
+                if(this.isEnPassantPossible(to, moved)) {
+                    const enPassantIndex: number = to.getIndex() ^ 8;
+                    this.enPassant._value = getSquareValue(enPassantIndex);
+                }
             }
         }
 
         if(moveType == MoveType.CASTLING) {
-            // TODO
+            const castlingValue: CastlingValue = Castling.fromKingTargetIndex(to.getIndex());
+            const startingRookIndex = Castling.getRookSourceIndex(castlingValue);
+            const endingRookIndex = Castling.getRookTargetIndex(castlingValue);
+
+            const rook: Piece = this.getPiece(startingRookIndex);
+
+            // Remove rook and king
+            this.removePiece(startingRookIndex);
+            this.removePiece(from.getIndex());
+
+            // Place rook and king at new positions
+            this.placePiece(endingRookIndex, rook);
+            this.placePiece(to.getIndex(), moved);
         }
+        else if(moveType == MoveType.PROMOTION) {
+            const promotionPiece: Piece = getPieceFromType(move._promotionType, this.sideToMove);
+
+            this.removePiece(from.getIndex());
+            this.placePiece(to.getIndex(), promotionPiece);
+        }
+        else {
+            this.removePiece(from.getIndex());
+            this.placePiece(to.getIndex(), moved);
+        }
+
+        if(moveType == MoveType.ENPASSANT) {
+            const enPassantIndex: number = to.getIndex() ^ 8;
+            this.removePiece(enPassantIndex);
+        }
+
+        this.sideToMove = getOpposite(this.sideToMove);
     }
 
     /**

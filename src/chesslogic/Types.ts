@@ -43,6 +43,24 @@ export enum PieceType {
 }
 
 /**
+ * Returns a new instance of a Piece with the provided pieceType and color
+ *
+ * @param pieceType
+ * @param color
+ */
+export function getPieceFromType(pieceType: PieceType, color: Color): Piece {
+    switch (pieceType) {
+        case PieceType.PAWN: return new Pawn(color);
+        case PieceType.KNIGHT: return new Pawn(color);
+        case PieceType.BISHOP: return new Pawn(color);
+        case PieceType.ROOK: return new Pawn(color);
+        case PieceType.QUEEN: return new Pawn(color);
+        case PieceType.KING: return new Pawn(color);
+        default: return NullPiece.instance;
+    }
+}
+
+/**
  * Enum containing all different move types in chess
  */
 export enum MoveType {
