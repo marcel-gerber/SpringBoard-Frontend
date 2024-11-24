@@ -17,7 +17,7 @@ export class Attacks {
      * @private
      */
     private static addAttackRay(squares: Square[], direction: Direction, piece: Piece, board: Board, from: Square,
-                         kingCheck: (s: Square) => boolean): void {
+                                kingCheck: (s: Square) => boolean): void {
         let to: Square = Square.add(from, direction);
 
         while(to._value != SquareValue.NONE) {
