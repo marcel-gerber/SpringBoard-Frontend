@@ -84,6 +84,22 @@ export class Board {
     }
 
     /**
+     * Returns the king's square based on the color
+     *
+     * @param color
+     */
+    public getKingSquare(color: Color): Square {
+        for(let index = 0; index < this.pieces.length; index++) {
+            const piece: Piece = this.getPiece(index);
+
+            if(piece instanceof King && piece.color == color) {
+                return new Square(getSquareValue(index));
+            }
+        }
+        return new Square(SquareValue.NONE);
+    }
+
+    /**
      * Places a piece on the board
      *
      * @param index
@@ -191,14 +207,42 @@ export class Board {
     public getAttackedSquares(color: Color): Array<Square> {
         const attackedSquares: Array<Square> = [];
 
-        for(let i = 0; i < this.pieces.length; i++) {
-            const piece: Piece = this.getPiece(i);
+        for(let index = 0; index < this.pieces.length; index++) {
+            const piece: Piece = this.getPiece(index);
             if(piece.color != color) continue;
 
-            const attacks: Array<Square> = piece.attackedSquares(this, new Square(getSquareValue(i)));
+            const attacks: Array<Square> = piece.attackedSquares(this, new Square(getSquareValue(index)));
             attackedSquares.push(...attacks);
         }
         return attackedSquares;
+    }
+
+    /**
+     * Returns 'true' when there is currently a check
+     */
+    public isCheck(): boolean {
+        const kingSquare: Square = this.getKingSquare(getOpposite(this.sideToMove));
+
+        for(const attacked of this.getAttackedSquares(this.sideToMove)) {
+            if(kingSquare._value == attacked._value) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns all current pseudo legal moves
+     */
+    public getPseudoLegalMoves(): Array<Move> {
+        const pseudoLegalMoves: Array<Move> = [];
+
+        for(let index = 0; index < this.pieces.length; index++) {
+            const piece: Piece = this.getPiece(index);
+            if(piece.color != this.sideToMove) continue;
+
+            const moves: Array<Move> = piece.pseudoLegalMoves(this, new Square(getSquareValue(index)));
+            pseudoLegalMoves.push(...moves);
+        }
+        return pseudoLegalMoves;
     }
 
     /**
@@ -309,6 +353,74 @@ export class Board {
         }
 
         this.sideToMove = getOpposite(this.sideToMove);
+    }
+
+    /**
+     * Undo the last played move on the board
+     *
+     * @param move The last played Move
+     */
+    public unmakeMove(move: Move): void {
+        const stateInfo: StateInfo | undefined = this.prevStates.pop();
+        if(stateInfo === undefined) throw new Error("StateInfo is undefined");
+
+        this.castling = stateInfo.castling;
+        this.enPassant = stateInfo.enPassant;
+        this.halfMoveCounter = stateInfo.halfMoveCounter;
+        const captured: Piece = stateInfo.captured;
+
+        this.sideToMove = getOpposite(this.sideToMove);
+
+        const from: Square = move._from;
+        const to: Square = move._to;
+        const moveType: MoveType = move._moveType;
+
+        if(moveType == MoveType.CASTLING) {
+            const castlingValue: CastlingValue = Castling.fromKingTargetIndex(to.getIndex());
+            const startingRookIndex = Castling.getRookSourceIndex(castlingValue);
+            const endingRookIndex = Castling.getRookTargetIndex(castlingValue);
+
+            const rook: Piece = this.getPiece(endingRookIndex);
+            const king: Piece = this.getPiece(to.getIndex());
+
+            // Remove rook and king
+            this.removePiece(endingRookIndex);
+            this.removePiece(to.getIndex());
+
+            // Place rook and king at old positions
+            this.placePiece(startingRookIndex, rook);
+            this.placePiece(from.getIndex(), king);
+
+            return;
+        }
+
+        if(moveType == MoveType.PROMOTION) {
+            const pawn: Pawn = new Pawn(this.sideToMove);
+
+            this.removePiece(to.getIndex());
+            this.placePiece(from.getIndex(), pawn);
+
+            if(!(captured instanceof NullPiece)) {
+                this.placePiece(to.getIndex(), captured);
+            }
+            return;
+        }
+
+        const moved: Piece = this.getPiece(to.getIndex());
+        this.removePiece(to.getIndex());
+        this.placePiece(from.getIndex(), moved);
+
+        if(moveType == MoveType.ENPASSANT) {
+            const pawn: Pawn = new Pawn(getOpposite(this.sideToMove));
+            const pawnIndex: number = this.enPassant.getIndex() ^ 8;
+
+            this.placePiece(pawnIndex, pawn);
+            return;
+        }
+
+        if(!(captured instanceof NullPiece)) {
+            this.placePiece(to.getIndex(), captured);
+        }
     }
 
     /**
