@@ -14,7 +14,9 @@ export class Rook extends Piece {
     public pseudoLegalMoves(board: Board, from: Square): Array<Move> {
         const legalMoves: Array<Move> = [];
 
-        for(const to of Attacks.getRookAttacks(board, this, from, board.isKing)) {
+        // Very important note for myself: When passing a function as a parameter, ALWAYS use
+        // Inline-Arrow-Functions like shown below. Otherwise, the context of "this" will be lost
+        for(const to of Attacks.getRookAttacks(board, this, from, (square) => board.isKing(square))) {
             legalMoves.push(new Move(from, to));
         }
         return legalMoves;
