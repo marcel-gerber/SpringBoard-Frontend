@@ -1,22 +1,11 @@
 import {Board} from "../chesslogic/Board.ts";
 import {Piece} from "../chesslogic/pieces/Piece.ts";
-import {Square} from "../chesslogic/Square.ts";
-import {Color} from "../chesslogic/Types.ts";
 
 export default function Chessboard() {
     const board: Board = new Board();
     board.setFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
 
-    const attacks: Array<Square> = board.getAttackedSquares(Color.BLACK);
-    console.log("attacks", attacks);
-
-    function getSquareColor(row: number, col: number, index: number): string {
-        let found: boolean = false;
-        attacks.forEach(square => {
-            if(square.getIndex() == index) found = true;
-        });
-        if(found) return "bg-red-300";
-
+    function getSquareColor(row: number, col: number): string {
         return (row + col) % 2 === 0 ? "bg-gray-200" : "bg-gray-700";
     }
 
@@ -43,7 +32,7 @@ export default function Chessboard() {
                 return (
                     <div
                         key={index}
-                        className={`${getSquareColor(row, col, index)} flex items-center justify-center aspect-square`}
+                        className={`${getSquareColor(row, col)} flex items-center justify-center aspect-square`}
                     >
                         {pieceImage && <img src={pieceImage} alt={piece.character()} className="w-full h-full"/>}
                     </div>
