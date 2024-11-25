@@ -46,6 +46,7 @@ export class Board {
     public castling: Castling;
     public enPassant: Square;
     public halfMoveCounter: number;
+    public plies: number;
 
     // All previous states of the board will be saved in here
     private prevStates: StateInfo[] = [];
@@ -55,6 +56,7 @@ export class Board {
         this.castling = new Castling();
         this.enPassant = new Square(SquareValue.NONE);
         this.halfMoveCounter = 0;
+        this.plies = 0;
 
         for(let i = 0; i < this.pieces.length; i++) {
             this.pieces[i] = NullPiece.instance;
@@ -68,6 +70,13 @@ export class Board {
      */
     public getPiece(index: number): Piece {
         return this.pieces[index];
+    }
+
+    /**
+     * Returns the boards' full move counter
+     */
+    public getFullMoveCounter(): number {
+        return Math.round(1 + this.plies / 2);
     }
 
     /**
@@ -283,6 +292,7 @@ export class Board {
         this.prevStates.push(stateInfo);
 
         this.halfMoveCounter++;
+        this.plies++;
 
         if(this.enPassant._value != SquareValue.NONE) {
             this.enPassant._value = SquareValue.NONE;
@@ -370,6 +380,7 @@ export class Board {
         const captured: Piece = stateInfo.captured;
 
         this.sideToMove = getOpposite(this.sideToMove);
+        this.plies--;
 
         const from: Square = move._from;
         const to: Square = move._to;
@@ -435,10 +446,15 @@ export class Board {
         const castling: string = split.length > 2 ? split[2] : "-";
         const enPassant: string = split.length > 3 ? split[3] : "-";
         const halfMove: string = split.length > 4 ? split[4] : "0";
+        const fullMove: string = split.length > 5 ? split[5] : "1";
 
         this.sideToMove = sideToMove === "w" ? Color.WHITE : Color.BLACK;
         this.enPassant.setValueFromString(enPassant);
         this.halfMoveCounter = Number(halfMove);
+        this.plies = Number(fullMove);
+        this.plies = this.plies * 2 - 2;
+
+        if(this.sideToMove == Color.BLACK) this.plies++;
 
         let index: number = 56;
         for(const char of pieces) {
@@ -472,6 +488,48 @@ export class Board {
                     this.castling.set(CastlingValue.BLACK_000);
             }
         }
+    }
+
+    /**
+     * Returns the current board position as a FEN string
+     */
+    public getFen(): string {
+        const fen: string[] = [];
+
+        // Pieces
+        for(let rank = 7; rank >= 0; rank--) {
+            let emptySquares: number = 0;
+            
+            for(let file = 0; file < 8; file++) {
+                const index = rank * 8 + file;
+                const piece: Piece = this.getPiece(index);
+                
+                if(piece instanceof NullPiece) {
+                    emptySquares++;
+                }
+                else {
+                    if(emptySquares > 0) {
+                        fen.push(String(emptySquares));
+                        emptySquares = 0;
+                    }
+                    fen.push(piece.character());
+                }
+            }
+            
+            if(emptySquares > 0)
+                fen.push(String(emptySquares));
+            
+            if(rank > 0)
+                fen.push("/");
+        }
+
+        fen.push(" ", this.sideToMove == Color.WHITE ? "w" : "b");
+        fen.push(" ", this.castling.toString());
+        fen.push(" ", this.enPassant.toString());
+        fen.push(" ", String(this.halfMoveCounter));
+        fen.push(" ", String(this.getFullMoveCounter()));
+
+        return fen.join("");
     }
 
     /**
