@@ -19,7 +19,7 @@ export enum CastlingValue {
 export class Castling {
 
     // All castling rights will be saved in a single byte
-    private castlingRights: number;
+    public castlingRights: number;
 
     private static readonly blackCastlings: CastlingValue[] = [CastlingValue.BLACK_00, CastlingValue.BLACK_000];
     private static readonly whiteCastlings: CastlingValue[] = [CastlingValue.WHITE_00, CastlingValue.WHITE_000];
@@ -108,9 +108,9 @@ export class Castling {
      * @param color
      */
     public hasAny(color: Color): boolean {
-        Castling.getCastlings(color).forEach((castlingValue: CastlingValue) => {
+        for(const castlingValue of Castling.getCastlings(color)) {
             if(this.has(castlingValue)) return true;
-        });
+        }
         return false;
     }
 
@@ -232,6 +232,19 @@ export class Castling {
             case CastlingValue.WHITE_000: return Castling.white000NotAttacked;
             default: return [] as number[];
         }
+    }
+
+    public toString(): string {
+        if(this.hasNoCastling()) return "-";
+
+        let str: string = "";
+
+        if(this.has(CastlingValue.WHITE_00)) str += "K";
+        if(this.has(CastlingValue.WHITE_000)) str += "Q";
+        if(this.has(CastlingValue.BLACK_00)) str += "k";
+        if(this.has(CastlingValue.BLACK_000)) str += "q";
+
+        return str;
     }
 
 }

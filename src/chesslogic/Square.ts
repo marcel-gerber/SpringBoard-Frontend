@@ -63,4 +63,17 @@ export class Square {
         return targetSquare;
     }
 
+    public toString(): string {
+        if(this._value == SquareValue.NONE) return "-";
+
+        let str: string = "";
+
+        const file: string = String.fromCharCode("a".charCodeAt(0) + this.getFileIndex());
+        const rank: string = String.fromCharCode("1".charCodeAt(0) + this.getRankIndex());
+
+        str += file;
+        str += rank;
+        return str;
+    }
+
 }
