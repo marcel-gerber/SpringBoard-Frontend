@@ -1,5 +1,7 @@
 import {Move} from "../chesslogic/Move.ts";
 import {Board} from "../chesslogic/Board.ts";
+import {MoveType} from "../chesslogic/Types.ts";
+import {createWriteStream} from "fs";
 
 class PerftResult {
 
@@ -18,6 +20,8 @@ class PerftResult {
 class Perft {
 
     public board: Board;
+    public debug: number = 0;
+    private file = createWriteStream("debug.txt", { flags: "a" });
 
     public constructor() {
         this.board = new Board();
@@ -29,10 +33,13 @@ class Perft {
         let nodes: number = 0;
         const pseudoLegalMoves: Array<Move> = this.board.getPseudoLegalMoves();
 
+        this.file.write(this.board.getFen() + "\n");
+
         for(const move of pseudoLegalMoves) {
             this.board.makeMove(move);
 
             if(!this.board.isCheck()) {
+                this.file.write(move._from.toString() + move._to.toString() + "\n");
                 nodes += this.perft(depth - 1);
             }
 
@@ -54,9 +61,12 @@ const standardPositions: Array<PerftResult> = [
 
 test("standardPositions", () => {
     const perft: Perft = new Perft();
-    const result: PerftResult = new PerftResult("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1", 3, 97862);
+    const result: PerftResult = new PerftResult("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1", 3, 9467);
 
     perft.board.setFen(result.fen);
 
-    expect(perft.perft(result.depth)).toBe(result.nodes);
+    const nodes: number = perft.perft(result.depth);
+    console.log(perft.debug);
+
+    expect(nodes).toBe(result.nodes);
 });
