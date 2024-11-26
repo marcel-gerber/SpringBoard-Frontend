@@ -51,11 +51,11 @@ export enum PieceType {
 export function getPieceFromType(pieceType: PieceType, color: Color): Piece {
     switch (pieceType) {
         case PieceType.PAWN: return new Pawn(color);
-        case PieceType.KNIGHT: return new Pawn(color);
-        case PieceType.BISHOP: return new Pawn(color);
-        case PieceType.ROOK: return new Pawn(color);
-        case PieceType.QUEEN: return new Pawn(color);
-        case PieceType.KING: return new Pawn(color);
+        case PieceType.KNIGHT: return new Knight(color);
+        case PieceType.BISHOP: return new Bishop(color);
+        case PieceType.ROOK: return new Rook(color);
+        case PieceType.QUEEN: return new Queen(color);
+        case PieceType.KING: return new King(color);
         default: return NullPiece.instance;
     }
 }
