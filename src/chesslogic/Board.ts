@@ -57,10 +57,7 @@ export class Board {
         this.enPassant = new Square(SquareValue.NONE);
         this.halfMoveCounter = 0;
         this.plies = 0;
-
-        for(let i = 0; i < this.pieces.length; i++) {
-            this.pieces[i] = NullPiece.instance;
-        }
+        this.init();
     }
 
     /**
@@ -76,7 +73,7 @@ export class Board {
      * Returns the boards' full move counter
      */
     public getFullMoveCounter(): number {
-        return Math.round(1 + this.plies / 2);
+        return Math.floor(1 + this.plies / 2);
     }
 
     /**
@@ -252,6 +249,23 @@ export class Board {
             pseudoLegalMoves.push(...moves);
         }
         return pseudoLegalMoves;
+    }
+
+    /**
+     * Returns all current legal moves
+     */
+    public getLegalMoves(): Array<Move> {
+        const pseudoLegalMoves: Array<Move> = this.getPseudoLegalMoves();
+        const legalMoves: Array<Move> = [];
+
+        for(const move of pseudoLegalMoves) {
+            this.makeMove(move);
+            if(!this.isCheck()) {
+                legalMoves.push(move);
+            }
+            this.unmakeMove(move);
+        }
+        return legalMoves;
     }
 
     /**
@@ -530,6 +544,30 @@ export class Board {
         fen.push(" ", String(this.getFullMoveCounter()));
 
         return fen.join("");
+    }
+
+    /**
+     * Initializes the board with empty pieces
+     *
+     * @private
+     */
+    private init(): void {
+        for(let i = 0; i < this.pieces.length; i++) {
+            this.pieces[i] = NullPiece.instance;
+        }
+    }
+
+    /**
+     * Resets all the boards' data
+     */
+    public reset(): void {
+        this.init();
+        this.sideToMove = Color.WHITE;
+        this.castling.reset();
+        this.enPassant._value = SquareValue.NONE;
+        this.halfMoveCounter = 0;
+        this.plies = 0;
+        this.prevStates = [];
     }
 
     /**
