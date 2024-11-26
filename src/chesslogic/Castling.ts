@@ -234,6 +234,13 @@ export class Castling {
         }
     }
 
+    /**
+     * Resets the castling rights
+     */
+    public reset(): void {
+        this.castlingRights = CastlingValue.NO_CASTLING;
+    }
+
     public toString(): string {
         if(this.hasNoCastling()) return "-";
 
