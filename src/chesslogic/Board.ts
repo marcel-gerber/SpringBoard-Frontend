@@ -454,6 +454,8 @@ export class Board {
      * @param fen
      */
     public setFen(fen: string): void {
+        this.reset();
+
         const split: string[] = fen.split(" ");
         const pieces: string = split[0];
         const sideToMove: string = split.length > 1 ? split[1] : "w";
@@ -568,31 +570,6 @@ export class Board {
         this.halfMoveCounter = 0;
         this.plies = 0;
         this.prevStates = [];
-    }
-
-    /**
-     * Prints the board
-     */
-    public print(): void {
-        let index: number = 56;
-
-        for(let i = 0; i < 8; i++) {
-            let output: string = "---------------------------------\n";
-
-            for(let j = 0; j < 8; j++) {
-                output += "| ";
-                output += this.getPiece(index).character();
-                output += " ";
-
-                index++;
-            }
-
-            output += "|\n";
-            output += "---------------------------------\n";
-            index -= 16;
-
-            console.log(output);
-        }
     }
 
 }
