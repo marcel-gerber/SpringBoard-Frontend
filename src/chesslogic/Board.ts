@@ -572,4 +572,19 @@ export class Board {
         this.prevStates = [];
     }
 
+    /**
+     * Copies the Board
+     */
+    public copy(): Board {
+        const newBoard = new Board();
+        newBoard.pieces = this.pieces.slice();
+        newBoard.sideToMove = this.sideToMove;
+        newBoard.castling.castlingRights = this.castling.castlingRights;
+        newBoard.enPassant._value = this.enPassant._value;
+        newBoard.halfMoveCounter = this.halfMoveCounter;
+        newBoard.plies = this.plies;
+        newBoard.prevStates = this.prevStates.slice();
+        return newBoard;
+    }
+
 }
