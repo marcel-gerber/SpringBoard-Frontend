@@ -1,12 +1,10 @@
 import "./styles/App.css";
-import Chessboard from "./components/Chessboard.tsx";
+import Home from "./pages/Home.tsx";
 
-function App() {
+export default function App() {
     return (
-        <div className="flex justify-center items-center h-screen">
-            <Chessboard />
-        </div>
+        <>
+            <Home/>
+        </>
     );
 }
-
-export default App;
