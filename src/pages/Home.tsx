@@ -1,10 +1,12 @@
 import NavBar from "../components/NavBar.tsx";
 import Chessboard from "../components/Chessboard.tsx";
+import Footer from "../components/Footer.tsx";
+import FeatureCards from "../components/FeatureCards.tsx";
 
 export default function Home() {
     return (
         <>
-            <NavBar/>
+            <NavBar />
             <div className="min-h-screen bg-gradient-radial from-green-600/20 via-transparent">
                 <main className="pt-16">
                     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -19,13 +21,13 @@ export default function Home() {
                                     </p>
                                     <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
                                         <div className="rounded-md shadow">
-                                            <a href="#"
+                                            <a href="/"
                                                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-sky-900 hover:bg-sky-700 md:py-4 md:text-lg md:px-10">
-                                                Play a game
+                                                Login
                                             </a>
                                         </div>
                                         <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                                            <a href="#"
+                                            <a href="/signup"
                                                className="w-full flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-black/70 md:py-4 md:text-lg md:px-10">
                                                 Sign up
                                             </a>
@@ -39,9 +41,12 @@ export default function Home() {
             </div>
             <div className="min-h-screen bg-gradient-radial from-sky-600/20 via-transparent">
                 <div className="flex items-center justify-center">
-                    <Chessboard/>
+                    <Chessboard />
                 </div>
             </div>
+            <FeatureCards />
+            <br/>
+            <Footer />
         </>
     );
 }
