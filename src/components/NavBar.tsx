@@ -12,9 +12,9 @@ export default function NavBar() {
                     </div>
                     <div className="hidden md:flex space-x-6">
                         <a href="/" className="text-gray-100 hover:text-white transition">Home</a>
-                        <a href="#games" className="text-gray-100 hover:text-white transition">Games</a>
+                        <a href="/games" className="text-gray-100 hover:text-white transition">Games</a>
                         <a href="/login" className="text-gray-100 hover:text-white transition">Login</a>
-                        <a href="#singup" className="text-gray-100 hover:text-white transition">Signup</a>
+                        <a href="/signup" className="text-gray-100 hover:text-white transition">Signup</a>
                     </div>
                     <div className="md:hidden text-gray-300">Menu</div>
                 </div>
