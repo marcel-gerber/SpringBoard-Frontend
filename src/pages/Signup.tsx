@@ -1,35 +1,34 @@
 import NavBar from "../components/NavBar.tsx";
 import Footer from "../components/Footer.tsx";
 import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function Signup() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const navigate = useNavigate();
+    const [errorMessage, setErrorMessage] = useState("");
+
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        try {
-            const response = await fetch("http://localhost:8080/api/players/signup", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username: username,
-                    password: password,
-                }),
-            });
+        const response = await fetch("http://localhost:8080/api/players/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+            }),
+        });
 
-            if(response.ok) {
-                console.log("Account created successfully.");
-                return;
-            }
-            const errorData = await response.json();
-            console.log(errorData.message);
-        } catch (error) {
-            console.error(error);
+        if(response.ok) {
+            navigate("/");
+            return;
         }
+        setErrorMessage("Username already exists");
     }
 
     return (
@@ -73,6 +72,7 @@ export default function Signup() {
                                 >
                                     Sign Up
                                 </button>
+                                {errorMessage && (<p className="mt-2 pt-4 text-red-500">{errorMessage}</p>)}
                             </div>
                         </form>
 
