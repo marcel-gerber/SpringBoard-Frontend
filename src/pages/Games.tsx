@@ -17,7 +17,7 @@ export default function Games() {
                     setGames(data);
                 }
             } catch (error) {
-                setError(error);
+                setError(error as string);
             }
         };
 
@@ -34,8 +34,8 @@ export default function Games() {
                         <p className="text-red-500">{error}</p>
                     ) : (
                         <div className="grid grid-cols-1 gap-4">
-                            {games.map((game) => (
-                                <GameCard {...game as GameCardProps} />
+                            {games.map((game: GameCardProps) => (
+                                <GameCard key={game.id} {...game} />
                             ))}
                         </div>
                     )}
