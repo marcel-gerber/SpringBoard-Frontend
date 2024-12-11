@@ -4,15 +4,20 @@ import {Piece} from "../chesslogic/pieces/Piece.ts";
 import {Move} from "../chesslogic/Move.ts";
 import {NullPiece} from "../chesslogic/pieces/NullPiece.ts";
 
+interface ChessboardProps {
+    fen: string;
+    readOnly?: boolean;
+}
+
 function boardReducer(state: Board, action: { type: "move"; move: Move }): Board {
     const newBoard = state.copy();
     newBoard.makeMove(action.move);
     return newBoard;
 }
 
-export default function Chessboard() {
+export default function Chessboard({ fen, readOnly = false }: ChessboardProps) {
     const initialBoard = new Board();
-    initialBoard.setFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+    initialBoard.setFen(fen);
 
     const [board, dispatcher] = useReducer(boardReducer, initialBoard);
     const [attackedSquares, setAttackedSquares] = useState<Array<number>>([]);
@@ -30,12 +35,16 @@ export default function Chessboard() {
     }
 
     function updateAttackedSquares(index: number): void {
+        if(readOnly) return;
+
         setAttackedSquares(legalMoves
             .filter(value => value._from.getIndex() == index)
             .map(value => value._to.getIndex()));
     }
 
     function handleDragStart(index: number): void {
+        if(readOnly) return;
+
         updateAttackedSquares(index);
         setDraggedPiece(index);
     }
@@ -45,7 +54,7 @@ export default function Chessboard() {
     }
 
     function handleDrop(index: number): void {
-        if(draggedPiece === null) return;
+        if(readOnly || draggedPiece === null) return;
 
         const move: Move | undefined = legalMoves.find(
             (move) => move._from.getIndex() === draggedPiece && move._to.getIndex() === index
