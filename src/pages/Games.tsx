@@ -1,13 +1,19 @@
 import NavBar from "../components/NavBar.tsx";
 import Footer from "../components/Footer.tsx";
 import {useEffect, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import GameCard, {GameCardProps} from "../components/GameCard.tsx";
 import {Modal} from "flowbite-react";
+import WhitePawn from "/pieces/wP.svg";
+import BlackPawn from "/pieces/bP.svg";
+import {Color} from "../chesslogic/Types.ts";
 
 export default function Games() {
     const [games, setGames] = useState([]);
     const [error, setError] = useState("");
     const [openModal, setOpenModal] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchGames = async () => {
@@ -25,6 +31,23 @@ export default function Games() {
 
         fetchGames();
     }, []); // Empty dependency array to run only once
+
+    async function handleClick(color: Color) {
+        const response = await fetch("http://localhost:8080/api/games", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                color: color,
+            }),
+        });
+
+        if(response.ok) {
+            navigate("/");
+            return;
+        }
+    }
 
     return (
         <>
@@ -59,15 +82,33 @@ export default function Games() {
                 className="bg-transparent backdrop-blur-md"
                 show={openModal}
                 onClose={() => setOpenModal(false)}
-                size="lg"
+                size="sm"
             >
-                <Modal.Header className="bg-gray-700 border-b border-white/20">
-                    <h3 className="text-lg font-semibold text-white">Create a new game</h3>
+                <Modal.Header className="bg-[#141414] border-b border-white/20 rounded-t-lg">
+                    <span className="text-lg font-semibold text-white">Create a new game</span>
                 </Modal.Header>
-                <Modal.Body className="bg-gray-700 text-white">
-                    <div className="p-4 md:p-5">
-                        <p className="text-sm text-gray-400 font-normal">Choose a color</p>
-                    </div>
+                <Modal.Body className="bg-[#141414] text-white rounded-b-lg">
+                    <p className="text-sm text-gray-400 font-normal">Choose a color you would like to play with</p>
+                    <ul className="my-4 space-y-3">
+                        <li>
+                            <button
+                                onClick={() => handleClick(Color.WHITE)}
+                                className="flex items-center p-3 w-full text-base font-bold rounded-lg
+                                hover:shadow bg-gray-700/20 hover:bg-gray-700 text-white border border-white/30">
+                                <img src={WhitePawn} alt="Logo" className="w-8 h-8"/>
+                                <span className="ms-3 whitespace-nowrap">White</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={() => handleClick(Color.BLACK)}
+                                className="flex items-center p-3 w-full text-base font-bold rounded-lg
+                                hover:shadow bg-gray-700/20 hover:bg-gray-700 text-white border border-white/30">
+                                <img src={BlackPawn} alt="Logo" className="w-8 h-8"/>
+                                <span className="ms-3 whitespace-nowrap">Black</span>
+                            </button>
+                        </li>
+                    </ul>
                 </Modal.Body>
             </Modal>
 
