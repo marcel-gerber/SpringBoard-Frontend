@@ -8,7 +8,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check for an active session
     useEffect(() => {
         const checkSession = async () => {
-            const response = await fetch("http://localhost:8080/api/players/check-session", { credentials: "include" });
+            const response = await fetch("http://localhost:8080/api/players/session", { credentials: "include" });
             setIsLoggedIn(response.ok);
         };
 
