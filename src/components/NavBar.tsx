@@ -1,4 +1,5 @@
 import Logo from "/pieces/wN.svg";
+import {Link} from "react-router-dom";
 
 export default function NavBar() {
     return (
@@ -11,10 +12,10 @@ export default function NavBar() {
                         <div className="text-white font-semibold text-lg">SpringBoard</div>
                     </div>
                     <div className="hidden md:flex space-x-6">
-                        <a href="/" className="text-gray-100 hover:text-white transition">Home</a>
-                        <a href="/games" className="text-gray-100 hover:text-white transition">Games</a>
-                        <a href="/login" className="text-gray-100 hover:text-white transition">Login</a>
-                        <a href="/signup" className="text-gray-100 hover:text-white transition">Signup</a>
+                        <Link to="/" className="text-gray-100 hover:text-white transition">Home</Link>
+                        <Link to="/games" className="text-gray-100 hover:text-white transition">Games</Link>
+                        <Link to="/login" className="text-gray-100 hover:text-white transition">Login</Link>
+                        <Link to="/signup" className="text-gray-100 hover:text-white transition">Signup</Link>
                     </div>
                     <div className="md:hidden text-gray-300">Menu</div>
                 </div>

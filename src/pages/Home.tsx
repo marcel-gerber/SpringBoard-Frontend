@@ -2,6 +2,7 @@ import NavBar from "../components/NavBar.tsx";
 import Chessboard from "../components/Chessboard.tsx";
 import Footer from "../components/Footer.tsx";
 import FeatureCards from "../components/FeatureCards.tsx";
+import {Link} from "react-router-dom";
 
 export default function Home() {
     return (
@@ -21,16 +22,16 @@ export default function Home() {
                                     </p>
                                     <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
                                         <div className="rounded-md shadow">
-                                            <a href="/login"
+                                            <Link to="/login"
                                                className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-sky-900 hover:bg-sky-700 md:py-4 md:text-lg md:px-10">
                                                 Login
-                                            </a>
+                                            </Link>
                                         </div>
                                         <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                                            <a href="/signup"
+                                            <Link to="/signup"
                                                className="w-full flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-black/70 md:py-4 md:text-lg md:px-10">
                                                 Sign up
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>
