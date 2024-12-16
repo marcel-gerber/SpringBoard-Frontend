@@ -2,11 +2,13 @@ import NavBar from "../components/NavBar.tsx";
 import Footer from "../components/Footer.tsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../services/AuthProvider.tsx";
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const {login} = useAuth();
     const navigate = useNavigate();
     const [errorMessage, setErrorMessage] = useState("");
 
@@ -25,6 +27,7 @@ export default function Login() {
         });
 
         if(response.ok) {
+            login();
             navigate("/");
             return;
         }
