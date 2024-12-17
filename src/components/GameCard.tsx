@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Chessboard from "./Chessboard.tsx";
 
 export type GameCardProps = {
@@ -17,7 +18,9 @@ export default function GameCard(gameCardProps: GameCardProps) {
             </div>
 
             <div className="w-1/2 flex flex-col justify-center space-y-4 pl-6">
-                <h2 className="text-lg font-bold text-white">Game ID: {gameCardProps.id}</h2>
+                <Link to={`/games/${gameCardProps.id}`} className="text-white font-semibold hover:text-gray-300 transition">
+                    <h2 className="text-lg font-bold text-white">Game ID: {gameCardProps.id}</h2>
+                </Link>
                 <p className="text-sm text-gray-300 mt-2">State: {gameCardProps.state}</p>
                 <div className="mt-4">
                     <h3 className="text-white font-semibold">Players</h3>
