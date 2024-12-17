@@ -5,6 +5,7 @@ import Signup from "./pages/./Signup.tsx";
 import Login from "./pages/Login.tsx";
 import Games from "./pages/Games.tsx";
 import {AuthProvider} from "./services/AuthProvider.tsx";
+import Game from "./pages/Game.tsx";
 
 export default function App() {
     return (
@@ -15,6 +16,7 @@ export default function App() {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/games" element={<Games />} />
+                    <Route path="/games/:gameId" element={<Game />} />
                 </Routes>
             </BrowserRouter>
         </AuthProvider>
