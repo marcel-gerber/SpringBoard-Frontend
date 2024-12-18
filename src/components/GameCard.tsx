@@ -24,12 +24,16 @@ export default function GameCard(gameCardProps: GameCardProps) {
                 <p className="text-sm text-gray-300 mt-2">State: {gameCardProps.state}</p>
                 <div className="mt-4">
                     <h3 className="text-white font-semibold">Players</h3>
-                    <p className="text-gray-300">
-                        <span className="font-bold">White:</span> {gameCardProps.playerWhite.username}
-                    </p>
-                    <p className="text-gray-300">
-                        <span className="font-bold">Black:</span> {gameCardProps.playerBlack.username}
-                    </p>
+                    {gameCardProps.playerWhite &&
+                        <p className="text-gray-300">
+                            <span className="font-bold">White:</span> {gameCardProps.playerWhite.username}
+                        </p>
+                    }
+                    {gameCardProps.playerBlack &&
+                        <p className="text-gray-300">
+                            <span className="font-bold">Black:</span> {gameCardProps.playerBlack.username}
+                        </p>
+                    }
                 </div>
                 <div className="mt-4">
                     <h3 className="text-white font-semibold">Moves</h3>
