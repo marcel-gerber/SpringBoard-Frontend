@@ -47,11 +47,12 @@ export default function Games() {
     async function handleClickOnColor(color: Color) {
         const response = await fetch("http://localhost:8080/api/games", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                color: color,
+                color: color == Color.WHITE ? "white" : "black",
             }),
         });
 
