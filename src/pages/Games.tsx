@@ -57,7 +57,8 @@ export default function Games() {
         });
 
         if(response.ok) {
-            navigate("/");
+            const data: GameCardProps = await response.json();
+            navigate("/games/" + data.id);
             return;
         }
     }
