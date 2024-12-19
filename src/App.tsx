@@ -9,8 +9,8 @@ import Game from "./pages/Game.tsx";
 
 export default function App() {
     return (
-        <AuthProvider>
-            <BrowserRouter>
+        <BrowserRouter>
+            <AuthProvider>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/signup" element={<Signup />} />
@@ -18,7 +18,7 @@ export default function App() {
                     <Route path="/games" element={<Games />} />
                     <Route path="/games/:gameId" element={<Game />} />
                 </Routes>
-            </BrowserRouter>
-        </AuthProvider>
+            </AuthProvider>
+        </BrowserRouter>
     );
 }
