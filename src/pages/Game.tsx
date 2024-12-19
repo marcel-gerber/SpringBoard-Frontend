@@ -38,9 +38,7 @@ export default function Game() {
             <NavBar />
             <main className="pt-16">
                 <div className="flex justify-center p-4 mt-4">
-                    {isLoggedIn ? (game.fen && <Chessboard fen={game.fen} />)
-                        : (game.fen && <Chessboard fen={game.fen} readOnly={true} />)
-                    }
+                    {game.fen && <Chessboard fen={game.fen} readOnly={!isLoggedIn} />}
                 </div>
             </main>
             <Footer />
