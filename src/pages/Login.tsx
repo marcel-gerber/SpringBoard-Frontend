@@ -28,7 +28,8 @@ export default function Login() {
         });
 
         if(response.ok) {
-            login();
+            const data = await response.json();
+            login(data.playerId);
             navigate("/");
             return;
         }
