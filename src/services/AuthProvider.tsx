@@ -1,10 +1,23 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {useNavigate} from "react-router-dom";
 
-const AuthContext = createContext({ isLoggedIn: false, login: () => {}, logout: () => {} });
+interface AuthContextType {
+    isLoggedIn: boolean;
+    playerId: string;
+    login: (playerId: string) => void;
+    logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType>({
+    isLoggedIn: false,
+    playerId: "",
+    login: () => {},
+    logout: () => {}
+});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [playerId, setPlayerId] = useState<string>("");
     const navigate = useNavigate();
 
     // Check for an active session
@@ -17,7 +30,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         checkSession();
     }, []);
 
-    const login = () => setIsLoggedIn(true);
+    const login = (playerId: string) => {
+        setIsLoggedIn(true);
+        setPlayerId(playerId);
+    };
 
     const logout = async () => {
         const response = await fetch("http://localhost:8080/api/players/logout", {
@@ -26,13 +42,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         });
 
         if(response.ok) {
-            navigate("/");
             setIsLoggedIn(false);
+            setPlayerId("");
+            navigate("/");
         }
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn, playerId, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
