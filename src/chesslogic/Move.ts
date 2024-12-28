@@ -1,4 +1,4 @@
-import {MoveType, PieceType} from "./Types.ts";
+import {Color, getPieceFromType, MoveType, PieceType} from "./Types.ts";
 import {Square} from "./Square.ts";
 
 /**
@@ -14,11 +14,22 @@ export class Move {
     public constructor(from: Square,
                        to: Square,
                        moveType: MoveType = MoveType.NORMAL,
-                       promotionType: PieceType = PieceType.KNIGHT) {
+                       promotionType: PieceType = PieceType.NONE) {
         this._from = from;
         this._to = to;
         this._moveType = moveType;
         this._promotionType = promotionType;
+    }
+
+    /**
+     * Converts the move to a "Pure Coordinate Notation"-String
+     */
+    public toPureCoordinateNotation(): string {
+        if(this._promotionType === PieceType.NONE) {
+            return this._from.toString() + this._to.toString();
+        }
+        const char: string = getPieceFromType(this._promotionType, Color.BLACK).character();
+        return this._from.toString() + this._to.toString() + char;
     }
 
 }
