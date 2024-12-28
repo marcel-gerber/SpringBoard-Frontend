@@ -44,7 +44,7 @@ export default function Game() {
             <NavBar />
             <main className="pt-16">
                 <div className="flex justify-center p-4 mt-4">
-                    {game.fen && <Chessboard fen={game.fen} readOnly={!canPlay()}/>}
+                    {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true}/>}
                 </div>
                 <div className="absolute right-4 top-1/2 transform -translate-y-1/2 p-4 text-white">
                     <GameInfo key={game.id} {...game} />
