@@ -6,7 +6,9 @@ import {NullPiece} from "../chesslogic/pieces/NullPiece.ts";
 
 interface ChessboardProps {
     fen: string;
+    gameId?: string;
     readOnly?: boolean;
+    apiCalls?: boolean;
 }
 
 function boardReducer(state: Board, action: { type: "move"; move: Move }): Board {
@@ -15,7 +17,7 @@ function boardReducer(state: Board, action: { type: "move"; move: Move }): Board
     return newBoard;
 }
 
-export default function Chessboard({ fen, readOnly = false }: ChessboardProps) {
+export default function Chessboard({ fen, gameId = "", readOnly = false, apiCalls = false }: ChessboardProps) {
     const initialBoard = new Board();
     initialBoard.setFen(fen);
 
@@ -53,13 +55,33 @@ export default function Chessboard({ fen, readOnly = false }: ChessboardProps) {
         event.preventDefault();
     }
 
-    function handleDrop(index: number): void {
+    async function makeMoveRequest(move: Move): Promise<boolean> {
+        const response = await fetch(`http://localhost:8080/api/games/${gameId}/moves`, {
+            method: "PUT",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                move: move.toPureCoordinateNotation()
+            }),
+        });
+
+        return response.ok;
+    }
+
+    async function handleDrop(index: number): Promise<void> {
         if(readOnly || draggedPiece === null) return;
 
         const move: Move | undefined = legalMoves.find(
             (move) => move._from.getIndex() === draggedPiece && move._to.getIndex() === index
         );
         if(!move) return;
+
+        if(apiCalls) {
+            const success: boolean = await makeMoveRequest(move);
+            if (!success) return;
+        }
 
         dispatcher({ type: "move", move });
     }
