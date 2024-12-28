@@ -24,7 +24,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const checkSession = async () => {
             const response = await fetch("http://localhost:8080/api/players/session", { credentials: "include" });
-            setIsLoggedIn(response.ok);
+
+            if(response.ok) {
+                setIsLoggedIn(true);
+                const data = await response.json();
+                setPlayerId(data.playerId);
+            }
         };
 
         checkSession();
