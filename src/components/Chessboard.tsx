@@ -1,4 +1,4 @@
-import {useEffect, useReducer, useState} from "react";
+import {useEffect, useReducer, useRef, useState} from "react";
 import {Board} from "../chesslogic/Board.ts";
 import {Piece} from "../chesslogic/pieces/Piece.ts";
 import {Move} from "../chesslogic/Move.ts";
@@ -21,10 +21,45 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     const initialBoard = new Board();
     initialBoard.setFen(fen);
 
+    const eventSourceRef = useRef<EventSource | null>(null);
+
     const [board, dispatcher] = useReducer(boardReducer, initialBoard);
     const [attackedSquares, setAttackedSquares] = useState<Array<number>>([]);
     const [draggedPiece, setDraggedPiece] = useState<number | null>(null);
     const [legalMoves, setLegalMoves] = useState<Array<Move>>(board.getLegalMoves());
+
+    // Subscribe to Server-Sent Events
+    useEffect(() => {
+        if(!apiCalls || gameId === "") return;
+
+        if(!eventSourceRef.current) {
+            eventSourceRef.current = new EventSource(`http://localhost:8080/api/games/${gameId}/events`);
+            console.log("created");
+
+            eventSourceRef.current.onmessage = (event: MessageEvent) => {
+                const data: string = event.data;
+                console.log(data);
+
+                const move: Move | undefined = legalMoves.find((move) => move.toPureCoordinateNotation() === data);
+                if(!move) return;
+
+                dispatcher({ type: "move", move });
+            }
+
+            eventSourceRef.current.onerror = (error) => {
+                console.error(error);
+                eventSourceRef.current?.close();
+                eventSourceRef.current = null;
+            }
+        }
+
+        // Close connection when Chessboard is exited
+        return () => {
+            console.log("closed");
+            eventSourceRef.current?.close();
+            eventSourceRef.current = null;
+        };
+    }, [gameId]);
 
     // Update legalMoves when board gets updated
     useEffect(() => {
