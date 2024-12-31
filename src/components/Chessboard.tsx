@@ -1,4 +1,4 @@
-import {useEffect, useReducer, useRef, useState} from "react";
+import {useEffect, useReducer, useState} from "react";
 import {Board} from "../chesslogic/Board.ts";
 import {Piece} from "../chesslogic/pieces/Piece.ts";
 import {Move} from "../chesslogic/Move.ts";
@@ -21,8 +21,6 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     const initialBoard = new Board();
     initialBoard.setFen(fen);
 
-    const eventSourceRef = useRef<EventSource | null>(null);
-
     const [board, dispatcher] = useReducer(boardReducer, initialBoard);
     const [attackedSquares, setAttackedSquares] = useState<Array<number>>([]);
     const [draggedPiece, setDraggedPiece] = useState<number | null>(null);
@@ -32,34 +30,27 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     useEffect(() => {
         if(!apiCalls || gameId === "") return;
 
-        if(!eventSourceRef.current) {
-            eventSourceRef.current = new EventSource(`http://localhost:8080/api/games/${gameId}/events`);
-            console.log("created");
+        const eventSource: EventSource = new EventSource(`http://localhost:8080/api/games/${gameId}/events`);
 
-            eventSourceRef.current.onmessage = (event: MessageEvent) => {
-                const data: string = event.data;
-                console.log(data);
+        eventSource.addEventListener("move", (event: MessageEvent) => {
+            const data: string = event.data;
 
-                const move: Move | undefined = legalMoves.find((move) => move.toPureCoordinateNotation() === data);
-                if(!move) return;
+            const move: Move | undefined = legalMoves.find((move) => move.toPureCoordinateNotation() === data);
+            if(!move) return;
 
-                dispatcher({ type: "move", move });
-            }
+            dispatcher({ type: "move", move });
+        });
 
-            eventSourceRef.current.onerror = (error) => {
-                console.error(error);
-                eventSourceRef.current?.close();
-                eventSourceRef.current = null;
-            }
+        eventSource.onerror = (error) => {
+            console.error(error);
+            eventSource.close();
         }
 
         // Close connection when Chessboard is exited
         return () => {
-            console.log("closed");
-            eventSourceRef.current?.close();
-            eventSourceRef.current = null;
+            eventSource.close();
         };
-    }, [gameId]);
+    }, []);
 
     // Update legalMoves when board gets updated
     useEffect(() => {
