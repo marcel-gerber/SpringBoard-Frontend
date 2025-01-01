@@ -105,8 +105,8 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
         if(!move) return;
 
         if(apiCalls) {
-            const success: boolean = await makeMoveRequest(move);
-            if (!success) return;
+            await makeMoveRequest(move);
+            return;
         }
 
         dispatcher({ type: "move", move });
