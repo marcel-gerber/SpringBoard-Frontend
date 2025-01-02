@@ -5,8 +5,8 @@ import BlackPawn from "/pieces/bP.svg";
 
 export default function GameInfo(gameCardProps: GameCardProps) {
     return (
-        <Card className="w-fullmx-auto border dark:border-white/20 dark:bg-gray-700/10 rounded-lg">
-            <h5 className="text-2xl font-bold tracking-tight text-white text-center mb-4">
+        <Card className="w-fullmx-auto border text-white dark:border-white/20 dark:bg-gray-700/10 rounded-lg">
+            <h5 className="text-2xl font-bold tracking-tight text-center mb-4">
                 Info
             </h5>
             <div className="flex justify-between items-center mb-4">
