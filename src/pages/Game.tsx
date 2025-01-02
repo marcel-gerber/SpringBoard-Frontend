@@ -43,11 +43,13 @@ export default function Game() {
         <>
             <NavBar />
             <main className="pt-16">
-                <div className="flex justify-center p-4 mt-4">
-                    {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true}/>}
-                </div>
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 p-4 text-white">
-                    <GameInfo key={game.id} {...game} />
+                <div className="flex flex-col 2xl:flex-row items-center justify-center p-4 mt-4 relative">
+                    <div className="order-2 2xl:order-1 flex justify-center mx-auto">
+                        {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true} />}
+                    </div>
+                    <div className="order-1 2xl:order-2 w-auto 2xl:absolute 2xl:right-4 2xl:top-1/2 2xl:transform 2xl:-translate-y-1/2 p-4">
+                        <GameInfo key={game.id} {...game} />
+                    </div>
                 </div>
             </main>
             <Footer/>
