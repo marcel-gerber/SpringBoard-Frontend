@@ -1,4 +1,4 @@
-import {useEffect, useReducer, useState} from "react";
+import {useEffect, useReducer, useRef, useState} from "react";
 import {Board} from "../chesslogic/Board.ts";
 import {Piece} from "../chesslogic/pieces/Piece.ts";
 import {Move} from "../chesslogic/Move.ts";
@@ -24,7 +24,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     const [board, dispatcher] = useReducer(boardReducer, initialBoard);
     const [attackedSquares, setAttackedSquares] = useState<Array<number>>([]);
     const [draggedPiece, setDraggedPiece] = useState<number | null>(null);
-    const [legalMoves, setLegalMoves] = useState<Array<Move>>(board.getLegalMoves());
+    const legalMoves = useRef<Array<Move>>(board.getLegalMoves());
 
     // Subscribe to Server-Sent Events
     useEffect(() => {
@@ -35,7 +35,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
         eventSource.addEventListener("move", (event: MessageEvent) => {
             const data: string = event.data;
 
-            const move: Move | undefined = legalMoves.find((move) => move.toPureCoordinateNotation() === data);
+            const move: Move | undefined = legalMoves.current.find((move) => move.toPureCoordinateNotation() === data);
             if(!move) return;
 
             dispatcher({ type: "move", move });
@@ -55,7 +55,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     // Update legalMoves when board gets updated
     useEffect(() => {
         setAttackedSquares([]);
-        setLegalMoves(board.getLegalMoves());
+        legalMoves.current = board.getLegalMoves();
     }, [board]);
 
     function getSquareColor(row: number, col: number): string {
@@ -65,7 +65,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     function updateAttackedSquares(index: number): void {
         if(readOnly) return;
 
-        setAttackedSquares(legalMoves
+        setAttackedSquares(legalMoves.current
             .filter(value => value._from.getIndex() == index)
             .map(value => value._to.getIndex()));
     }
@@ -99,7 +99,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     async function handleDrop(index: number): Promise<void> {
         if(readOnly || draggedPiece === null) return;
 
-        const move: Move | undefined = legalMoves.find(
+        const move: Move | undefined = legalMoves.current.find(
             (move) => move._from.getIndex() === draggedPiece && move._to.getIndex() === index
         );
         if(!move) return;
