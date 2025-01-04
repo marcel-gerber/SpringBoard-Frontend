@@ -3,20 +3,21 @@ import Footer from "../components/Footer.tsx";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import GameCard, {GameCardProps} from "../components/GameCard.tsx";
-import {Alert, Modal} from "flowbite-react";
+import {Modal} from "flowbite-react";
 import WhitePawn from "/pieces/wP.svg";
 import BlackPawn from "/pieces/bP.svg";
 import {Color} from "../chesslogic/Types.ts";
 import {useAuth} from "../services/AuthProvider.tsx";
-import {HiInformationCircle} from "react-icons/hi";
+import {AlertFailure} from "../components/Alerts.tsx";
 
 export default function Games() {
     const [games, setGames] = useState([]);
     const [error, setError] = useState("");
     const [openModal, setOpenModal] = useState(false);
-    const [showError, setShowError] = useState(false);
+    const [showNotLoggedIn, setShowNotLoggedIn] = useState(false);
+    const [showCannotJoin, setShowCannotJoin] = useState(false);
 
-    const {isLoggedIn} = useAuth();
+    const {isLoggedIn, playerId} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -38,10 +39,32 @@ export default function Games() {
 
     function handleClickOnCreateGame() {
         if(!isLoggedIn) {
-            setShowError(true);
+            setShowNotLoggedIn(true);
             return;
         }
         setOpenModal(true);
+    }
+
+    async function handleClickOnJoinGame(gameId: string, waitingPlayerId: string) {
+        if(!isLoggedIn) {
+            setShowNotLoggedIn(true);
+            return;
+        }
+
+        if(playerId === waitingPlayerId) {
+            setShowCannotJoin(true);
+            return;
+        }
+
+        const response = await fetch(`http://localhost:8080/api/games/${gameId}`, {
+            method: "PUT",
+            credentials: "include"
+        });
+
+        if(response.ok) {
+            await response.json();
+            navigate("/games/" + gameId);
+        }
     }
 
     async function handleClickOnColor(color: Color) {
@@ -68,16 +91,11 @@ export default function Games() {
             <NavBar/>
             <main className="pt-16">
                 <div className="p-4">
-                    {showError && (
-                        <div className="justify-center max-w-sm mx-auto mb-4">
-                            <Alert
-                                color="failure"
-                                onDismiss={() => setShowError(false)}
-                                icon={HiInformationCircle}
-                            >
-                                <span className="font-medium">You are not logged in!</span>
-                            </Alert>
-                        </div>
+                    {showNotLoggedIn && (
+                        <AlertFailure message={"You are not logged in!"} onClose={() => setShowNotLoggedIn(false)} />
+                    )}
+                    {showCannotJoin && (
+                        <AlertFailure message={"You can't join your own game!"} onClose={() => setShowCannotJoin(false)} />
                     )}
 
                     <h1 className="text-3xl font-extrabold mb-6 text-white relative
@@ -98,8 +116,8 @@ export default function Games() {
                         <p className="text-red-500">{error}</p>
                     ) : (
                         <div className="grid grid-cols-1 gap-4">
-                        {games.map((game: GameCardProps) => (
-                                <GameCard key={game.id} {...game} />
+                            {games.map((game: GameCardProps) => (
+                                <GameCard key={game.id} handleJoinGame={handleClickOnJoinGame} {...game} />
                             ))}
                         </div>
                     )}
