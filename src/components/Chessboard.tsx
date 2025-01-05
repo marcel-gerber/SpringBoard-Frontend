@@ -9,6 +9,7 @@ interface ChessboardProps {
     gameId?: string;
     readOnly?: boolean;
     apiCalls?: boolean;
+    eventSource?: EventSource | null;
 }
 
 function boardReducer(state: Board, action: { type: "move"; move: Move }): Board {
@@ -17,20 +18,20 @@ function boardReducer(state: Board, action: { type: "move"; move: Move }): Board
     return newBoard;
 }
 
-export default function Chessboard({ fen, gameId = "", readOnly = false, apiCalls = false }: ChessboardProps) {
+export default function Chessboard({ fen, gameId = "", readOnly = false, apiCalls = false, eventSource = null }: ChessboardProps) {
     const initialBoard = new Board();
     initialBoard.setFen(fen);
 
     const [board, dispatcher] = useReducer(boardReducer, initialBoard);
     const [attackedSquares, setAttackedSquares] = useState<Array<number>>([]);
     const [draggedPiece, setDraggedPiece] = useState<number | null>(null);
+
     const legalMoves = useRef<Array<Move>>(board.getLegalMoves());
+    const subscribed = useRef<boolean>(false);
 
-    // Subscribe to Server-Sent Events
-    useEffect(() => {
-        if(!apiCalls || gameId === "") return;
-
-        const eventSource: EventSource = new EventSource(`http://localhost:8080/api/games/${gameId}/events`);
+    function registerEvent(): void {
+        if(!apiCalls || gameId === "" || !eventSource) return;
+        if(subscribed.current) return;
 
         eventSource.addEventListener("move", (event: MessageEvent) => {
             const data: string = event.data;
@@ -46,11 +47,12 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
             eventSource.close();
         }
 
-        // Close connection when Chessboard is exited
-        return () => {
-            eventSource.close();
-        };
-    }, []);
+        subscribed.current = true;
+    }
+
+    useEffect(() => {
+        registerEvent();
+    }, [eventSource]);
 
     // Update legalMoves when board gets updated
     useEffect(() => {
