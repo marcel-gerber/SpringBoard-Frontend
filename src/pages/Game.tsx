@@ -2,7 +2,7 @@ import NavBar from "../components/NavBar.tsx";
 import Chessboard from "../components/Chessboard.tsx";
 import {useParams} from "react-router-dom";
 import Footer from "../components/Footer.tsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {GameCardProps} from "../components/GameCard.tsx";
 import {useAuth} from "../services/AuthProvider.tsx";
 import GameInfo from "../components/GameInfo.tsx";
@@ -10,6 +10,8 @@ import GameInfo from "../components/GameInfo.tsx";
 export default function Game() {
     const [game, setGame] = useState<GameCardProps>({} as GameCardProps);
     const [error, setError] = useState("");
+    const eventSourceRef = useRef<EventSource | null>(null);
+
     const {playerId} = useAuth();
     const {gameId} = useParams();
 
@@ -18,21 +20,30 @@ export default function Game() {
         return game.playerWhite.id === playerId || game.playerBlack.id === playerId;
     }
 
-    useEffect(() => {
-        const fetchGame = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/api/games/${gameId}`);
+    async function fetchGame() {
+        try {
+            const response = await fetch(`http://localhost:8080/api/games/${gameId}`);
 
-                if(response.ok) {
-                    const data = await response.json();
-                    setGame(data);
-                }
-            } catch (error) {
-                setError(error as string);
+            if(response.ok) {
+                const data = await response.json();
+                setGame(data);
             }
-        };
+        } catch (err) {
+            setError(err as string);
+        }
+    }
 
-        fetchGame();
+    function subscribeToSSE() {
+        if(eventSourceRef.current) return;
+        eventSourceRef.current = new EventSource(`http://localhost:8080/api/games/${gameId}/events`);
+    }
+
+    useEffect(() => {
+        fetchGame().then(subscribeToSSE);
+
+        return () => {
+            eventSourceRef.current?.close();
+        }
     }, [gameId]);
 
     if(error) {
@@ -45,10 +56,11 @@ export default function Game() {
             <main className="pt-16">
                 <div className="flex flex-col 2xl:flex-row items-center justify-center p-4 mt-4 relative">
                     <div className="order-2 2xl:order-1 flex justify-center mx-auto">
-                        {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true} />}
+                        {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true}
+                                                 eventSource={eventSourceRef.current} />}
                     </div>
                     <div className="order-1 2xl:order-2 w-auto 2xl:absolute 2xl:right-4 2xl:top-1/2 2xl:transform 2xl:-translate-y-1/2 p-4">
-                        <GameInfo key={game.id} {...game} />
+                        <GameInfo key={game.id} eventSource={eventSourceRef.current} {...game} />
                     </div>
                 </div>
             </main>
