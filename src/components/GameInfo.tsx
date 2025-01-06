@@ -10,6 +10,8 @@ interface EventSourceProps {
 
 export default function GameInfo(props: GameCardProps & EventSourceProps) {
     const [moves, setMoves] = useState<string[]>(props.moves);
+    const [playerWhite, setPlayerWhite] = useState<string>(props.playerWhite ? props.playerWhite.username : "");
+    const [playerBlack, setPlayerBlack] = useState<string>(props.playerBlack ? props.playerBlack.username : "");
     const subscribed = useRef<boolean>(false);
 
     function registerEvent(): void {
@@ -18,6 +20,15 @@ export default function GameInfo(props: GameCardProps & EventSourceProps) {
         props.eventSource.addEventListener("move", (event: MessageEvent) => {
             const data: string = event.data;
             setMoves(moves => [...moves, data]);
+        });
+
+        props.eventSource.addEventListener("join", (event: MessageEvent) => {
+            const data: string = event.data;
+            if(playerWhite === "") {
+                setPlayerWhite(data);
+            } else {
+                setPlayerBlack(data);
+            }
         });
 
         subscribed.current = true;
@@ -40,13 +51,13 @@ export default function GameInfo(props: GameCardProps & EventSourceProps) {
                         className="mr-3"
                     />
                     <div className="text-left mr-10">
-                        {props.playerWhite && <p className="font-medium">{props.playerWhite.username}</p>}
+                        {playerWhite && <p className="font-medium">{playerWhite}</p>}
                         <p className="text-sm text-gray-400">White</p>
                     </div>
                 </div>
                 <div className="flex items-center">
                     <div className="text-right mr-3 ml-10">
-                        {props.playerBlack && <p className="font-medium">{props.playerBlack.username}</p>}
+                        {playerBlack && <p className="font-medium">{playerBlack}</p>}
                         <p className="text-sm text-gray-500 dark:text-gray-400">Black</p>
                     </div>
                     <Avatar
