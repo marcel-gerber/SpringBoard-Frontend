@@ -28,6 +28,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
 
     const legalMoves = useRef<Array<Move>>(board.getLegalMoves());
     const subscribed = useRef<boolean>(false);
+    const readOnlyRef = useRef<boolean>(readOnly);
 
     function registerEvent(): void {
         if(!apiCalls || gameId === "" || !eventSource) return;
@@ -40,6 +41,10 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
             if(!move) return;
 
             dispatcher({ type: "move", move });
+        });
+
+        eventSource.addEventListener("join", () => {
+            readOnlyRef.current = false;
         });
 
         eventSource.onerror = (error) => {
@@ -65,7 +70,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     }
 
     function updateAttackedSquares(index: number): void {
-        if(readOnly) return;
+        if(readOnlyRef.current) return;
 
         setAttackedSquares(legalMoves.current
             .filter(value => value._from.getIndex() == index)
@@ -73,7 +78,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     }
 
     function handleDragStart(index: number): void {
-        if(readOnly) return;
+        if(readOnlyRef.current) return;
 
         updateAttackedSquares(index);
         setDraggedPiece(index);
@@ -99,7 +104,7 @@ export default function Chessboard({ fen, gameId = "", readOnly = false, apiCall
     }
 
     async function handleDrop(index: number): Promise<void> {
-        if(readOnly || draggedPiece === null) return;
+        if(readOnlyRef.current || draggedPiece === null) return;
 
         const move: Move | undefined = legalMoves.current.find(
             (move) => move._from.getIndex() === draggedPiece && move._to.getIndex() === index
