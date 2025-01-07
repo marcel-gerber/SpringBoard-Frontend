@@ -12,7 +12,22 @@ export default function Home() {
                 <main className="pt-16">
                     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                         <div className="px-4 py-6 sm:px-0">
-                            <div className="mt-10 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
+                            <div className="mt-10 flex flex-col items-center pt-52 min-h-screen">
+                                <div className="flex space-x-6 mb-6">
+                                    <img
+                                        src="/src/assets/spring_boot.svg"
+                                        alt="Spring Boot Logo"
+                                        className="h-28 w-28 p-2 rounded-lg shadow-2xl shadow-lime-600/50
+                                        border border-white/10 hover:shadow-lime-600 transition-shadow"
+                                    />
+                                    <img
+                                        src="/src/assets/react.svg"
+                                        alt="React Logo"
+                                        className="h-28 w-28 p-2 rounded-lg shadow-2xl shadow-sky-600/50
+                                        border border-white/10 hover:shadow-sky-600 transition-shadow"
+                                    />
+                                </div>
+
                                 <div className="text-center">
                                     <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
                                         SpringBoard
