@@ -1,7 +1,7 @@
 import NavBar from "../components/NavBar.tsx";
 import Footer from "../components/Footer.tsx";
 import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 export default function Signup() {
     const [username, setUsername] = useState("");
@@ -79,9 +79,9 @@ export default function Signup() {
                         {/* Signup Link */}
                         <p className="text-sm text-center text-gray-400">
                             Already have an account?{' '}
-                            <a href="/login" className="text-blue-500 hover:underline">
+                            <Link to="/login" className="text-blue-500 hover:underline">
                                 Log in here
-                            </a>
+                            </Link>
                         </p>
                     </div>
                 </div>

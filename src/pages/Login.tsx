@@ -1,7 +1,7 @@
 import NavBar from "../components/NavBar.tsx";
 import Footer from "../components/Footer.tsx";
 import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useAuth} from "../services/AuthProvider.tsx";
 
 export default function Login() {
@@ -84,9 +84,9 @@ export default function Login() {
                         {/* Signup Link */}
                         <p className="text-sm text-center text-gray-400">
                             Don't have an account?{' '}
-                            <a href="/signup" className="text-blue-500 hover:underline">
+                            <Link to="/signup" className="text-blue-500 hover:underline">
                                 Create one here
-                            </a>
+                            </Link>
                         </p>
                     </div>
                 </div>
