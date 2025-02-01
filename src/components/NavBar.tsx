@@ -52,7 +52,7 @@ export default function NavBar() {
                         {isLoggedIn ? (
                             <button
                                 onClick={logout}
-                                className="block px-4 py-2 text-gray-100 hover:text-white"
+                                className="block w-full px-4 py-2 text-gray-100 hover:text-white"
                             >
                                 Logout
                             </button>
