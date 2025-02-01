@@ -46,7 +46,7 @@ export default function NavBar() {
 
                 {/* Mobile Menu Dropdown */}
                 {isMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 w-full bg-[#141414] shadow-lg rounded-b-lg py-2">
+                    <div className="md:hidden absolute top-full w-full bg-[#141414] shadow-lg rounded-b-lg py-2">
                         <Link to="/" className="block px-4 py-2 text-gray-100 hover:text-white">Home</Link>
                         <Link to="/games" className="block px-4 py-2 text-gray-100 hover:text-white">Games</Link>
                         {isLoggedIn ? (
