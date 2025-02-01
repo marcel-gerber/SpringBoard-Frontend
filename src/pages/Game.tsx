@@ -55,7 +55,7 @@ export default function Game() {
             <NavBar />
             <main className="pt-16">
                 <div className="flex flex-col 2xl:flex-row items-center justify-center p-4 mt-4 relative">
-                    <div className="order-2 2xl:order-1 flex justify-center mx-auto">
+                    <div className="order-2 2xl:order-1 w-full flex justify-center mx-auto">
                         {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true}
                                                  eventSource={eventSourceRef.current} />}
                     </div>
