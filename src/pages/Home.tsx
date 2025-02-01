@@ -55,8 +55,8 @@ export default function Home() {
                     </div>
                 </main>
             </div>
-            <div className="min-h-screen bg-gradient-radial from-sky-600/20 via-transparent">
-                <div className="flex items-center justify-center">
+            <div className="sm:min-h-screen min-h-[70vh] bg-gradient-radial from-sky-600/20 via-transparent">
+                <div className="flex items-center justify-center m-5">
                     <Chessboard fen={"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1"} />
                 </div>
             </div>
