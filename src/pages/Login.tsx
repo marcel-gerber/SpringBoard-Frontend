@@ -42,7 +42,7 @@ export default function Login() {
 
             <main className="pt-16">
                 <div className="flex min-h-[80svh] items-center justify-center">
-                    <div className="w-full max-w-md p-10 space-y-8 rounded-lg shadow-lg bg-gray-700/10 border border-white/30">
+                    <div className="w-full m-5 max-w-md p-7 sm:p-10 space-y-8 rounded-lg shadow-lg bg-gray-700/10 border border-white/30">
                         <h2 className="text-3xl font-bold text-center text-white">Login</h2>
                         <form className="space-y-6" onSubmit={handleSubmit}>
                             {/* Username */}
