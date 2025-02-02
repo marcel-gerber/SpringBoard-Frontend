@@ -13,22 +13,27 @@ export default function Signup() {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const response = await fetch("http://localhost:8080/api/players/signup", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-            }),
-        });
+        try {
+            const response = await fetch("http://localhost:8080/api/players/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            });
 
-        if(response.ok) {
-            navigate("/");
-            return;
+            if(response.ok) {
+                navigate("/");
+                return;
+            }
+            setErrorMessage("Username already exists");
+        } catch (e) {
+            const error: Error = e as Error;
+            setErrorMessage("Error: " + error.message);
         }
-        setErrorMessage("Username already exists");
     }
 
     return (
