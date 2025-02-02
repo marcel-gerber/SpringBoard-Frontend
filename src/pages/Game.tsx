@@ -21,16 +21,14 @@ export default function Game() {
     }
 
     async function fetchGame() {
-        try {
-            const response = await fetch(`http://localhost:8080/api/games/${gameId}`);
+        const response = await fetch(`http://localhost:8080/api/games/${gameId}`);
 
-            if(response.ok) {
-                const data = await response.json();
-                setGame(data);
-            }
-        } catch (err) {
-            setError(err as string);
+        if(response.ok) {
+            const data = await response.json();
+            setGame(data);
+            return;
         }
+        throw new Error("Game not found");
     }
 
     function subscribeToSSE() {
@@ -39,29 +37,36 @@ export default function Game() {
     }
 
     useEffect(() => {
-        fetchGame().then(subscribeToSSE);
+        fetchGame()
+            .then(subscribeToSSE)
+            .catch(e => {
+                const error: Error = e as Error;
+                setError(error.message);
+            });
 
         return () => {
             eventSourceRef.current?.close();
         }
     }, [gameId]);
 
-    if(error) {
-        return <p className="text-red-500">Error: Game not found</p>;
-    }
-
     return (
         <>
             <NavBar />
             <main className="pt-16">
                 <div className="flex flex-col 2xl:flex-row items-center justify-center p-4 mt-4 relative">
-                    <div className="order-2 2xl:order-1 w-full flex justify-center mx-auto">
-                        {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true}
-                                                 eventSource={eventSourceRef.current} />}
-                    </div>
-                    <div className="order-1 2xl:order-2 w-auto 2xl:absolute 2xl:right-4 2xl:top-1/2 2xl:transform 2xl:-translate-y-1/2 p-4">
-                        <GameInfo key={game.id} eventSource={eventSourceRef.current} {...game} />
-                    </div>
+                    {error ? (
+                        <p className="text-red-500">Error: {error}</p>
+                    ) : (
+                        <>
+                            <div className="order-2 2xl:order-1 w-full flex justify-center mx-auto">
+                                {game.fen && <Chessboard fen={game.fen} gameId={game.id} readOnly={!canPlay()} apiCalls={true}
+                                                         eventSource={eventSourceRef.current} />}
+                            </div>
+                            <div className="order-1 2xl:order-2 w-auto 2xl:absolute 2xl:right-4 2xl:top-1/2 2xl:transform 2xl:-translate-y-1/2 p-4">
+                                <GameInfo key={game.id} eventSource={eventSourceRef.current} {...game} />
+                            </div>
+                        </>
+                    )}
                 </div>
             </main>
             <Footer/>
