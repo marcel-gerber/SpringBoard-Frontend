@@ -35,8 +35,8 @@ export default function Login() {
                 return;
             }
             setErrorMessage("Invalid username or password");
-        } catch (err: unknown) {
-            const error: Error = err as Error;
+        } catch (e: unknown) {
+            const error: Error = e as Error;
             setErrorMessage("Error: " + error.message);
         }
     }
