@@ -15,25 +15,30 @@ export default function Login() {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const response = await fetch("http://localhost:8080/api/players/login", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password,
-            }),
-        });
+        try {
+            const response = await fetch("http://localhost:8080/api/players/login", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            });
 
-        if(response.ok) {
-            const data = await response.json();
-            login(data.playerId);
-            navigate("/");
-            return;
+            if(response.ok) {
+                const data = await response.json();
+                login(data.playerId);
+                navigate("/");
+                return;
+            }
+            setErrorMessage("Invalid username or password");
+        } catch (err: unknown) {
+            const error: Error = err as Error;
+            setErrorMessage("Error: " + error.message);
         }
-        setErrorMessage("Invalid username or password");
     }
 
     return (
