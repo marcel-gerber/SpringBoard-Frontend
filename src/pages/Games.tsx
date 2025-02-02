@@ -12,7 +12,7 @@ import {AlertFailure} from "../components/Alerts.tsx";
 
 export default function Games() {
     const [games, setGames] = useState([]);
-    const [error, setError] = useState("");
+    const [error, setError] = useState<Error | null>(null);
     const [openModal, setOpenModal] = useState(false);
     const [showNotLoggedIn, setShowNotLoggedIn] = useState(false);
     const [showCannotJoin, setShowCannotJoin] = useState(false);
@@ -21,21 +21,11 @@ export default function Games() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchGames = async () => {
-            try {
-                const response = await fetch("http://localhost:8080/api/games");
-
-                if(response.ok) {
-                    const data = await response.json();
-                    setGames(data);
-                }
-            } catch (error) {
-                setError(error as string);
-            }
-        };
-
-        fetchGames();
-    }, []); // Empty dependency array to run only once
+        fetch("http://localhost:8080/api/games")
+            .then(responses => responses.json())
+            .then(data => setGames(data))
+            .catch(error => setError(error));
+    }, []);
 
     function handleClickOnCreateGame() {
         if(!isLoggedIn) {
@@ -113,7 +103,7 @@ export default function Games() {
                         </button>
                     </div>
                     {error ? (
-                        <p className="text-red-500">{error}</p>
+                        <p className="text-red-500">Error: {error.message}</p>
                     ) : (
                         <div className="grid grid-cols-1 gap-4">
                             {games.map((game: GameCardProps) => (
