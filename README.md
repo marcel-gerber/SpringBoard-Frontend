@@ -1,16 +1,18 @@
 # SpringBoard - React Frontend
 
-A React-based chess game interface built with TypeScript and Vite. 
-This demo project serves as the frontend component of a Spring Boot and React 
-chess application.
+This demo project built with React, TypeScript, Tailwind and Vite serves as
+the frontend component for the SpringBoard backend built with Spring Boot. 
+With this simple frontend you can play chess against another player 
+(no time control). The source code for the backend can be found 
+[here](https://github.com/marcel-gerber/SpringBoard).
 
 ## Features
 
+- Chess logic
 - Responsive layout
 - TypeScript
 - Unit tests
 - Vite-based development environment
-- Integration with Spring Boot backend
 
 ## Installation
 
@@ -28,6 +30,9 @@ npm run dev
 ```
 
 ## Run tests
+
+[!WARNING]
+Running all Perft-tests can take some time.
 
 ```bash
 npm test
