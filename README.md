@@ -31,8 +31,8 @@ npm run dev
 
 ## Run tests
 
-[!WARNING]
-Running all Perft-tests can take some time.
+> [!WARNING]
+> Running all Perft-tests can take some time.
 
 ```bash
 npm test
